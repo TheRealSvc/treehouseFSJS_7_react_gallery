@@ -1,5 +1,4 @@
 import React from 'react';
-//import TeacherList from '../data/teachers';
 
 const Photo = () => {
     return (  
@@ -9,4 +8,4 @@ const Photo = () => {
     );
 }
 
-export default Teachers;
+export default Photo;
