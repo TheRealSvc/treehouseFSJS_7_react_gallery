@@ -5,44 +5,37 @@ class SearchForm extends Component {
   // Initializes a Default searchTopic using a "controlled component" pattern (https://reactjs.org/docs/forms.html#controlled-components)
   constructor(props) {
     super(props);
+    //console.log(`So jetzt in search-component: ${this.props.changeSearchTopic}`); // okay: kommt an
     this.state = {searchTopic: '',
                   path: '/' };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  state = {searchTopic: "forests"};
 
-// fetch imgaes using fetch api 
-  fetchImages = (searchTopic) => {
-    // ToDo replace api key by prop
-    let url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=bb7980f0ad50ca47d1b83d0f338862b3&text=${searchTopic}&per_page=20&format=json&nojsoncallback=1`
-    fetch(url)
-    .then(response => response.json())
-    .then(data => console.log(data));
-    };
-  
   // handles new searchTopics as requested by user input 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.setState( prevState => {
+    this.props.changeSearchTopic(this.state.searchTopic);
+    /*this.setState( prevState => {
         return {
           searchTopic: e.target.value,
           path: `/${e.target.value}`
         };
-      });
+      }); */  
   }
 
   handleChange(e) {
+    console.log(e.target.value) ;  
     this.setState({searchTopic: e.target.value, 
     path:`/${e.target.value}`});
-    this.props.history.push(`/${e.target.value}`); 
+    //this.props.history.push(`/${e.target.value}`); // okay, doesnt work ... check later 
   }
 
   render() {
     return (
         <form className="search-form" onSubmit={this.handleSubmit}>
-        <input type="search" name="search" placeholder="Search" required  value={this.state.searchTopic} onChange={this.handleChange}/>
+        <input type="search" name="search" placeholder="Search" required  value={this.state.searchTopic} onChange= {() => this.props.changeSearchTopic(this.props.searchTopic)}/>
         <button type="submit" className="search-button">
           <svg fill="#fff" height="24" viewBox="0 0 23 23" width="24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
