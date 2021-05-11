@@ -4,7 +4,9 @@ import SearchForm from './components/SearchForm';
 import Nav from './components/Nav';
 import PhotoContainer from './components/PhotoContainer';
 import NotFound from './components/NotFound';
+import Init from './components/Init';
 import apiKey from './config';
+
 
 import React, { Component } from 'react';
 import {
@@ -25,20 +27,21 @@ constructor(props) {
     photos: []
   }; 
 }
-  
+ 
  updateSearchTopic = (searchTopicDownstream) => {
+   console.log('in updateSearchTopic before if ');
    if (this.state.searchTopic !== searchTopicDownstream ) {
+    console.log('in updateSearchTopic after if ');
   this.setState( 
     {
       searchTopic: searchTopicDownstream,
       prevSearchTopic: this.state.searchTopic
-    }, () => {this.createPhotoComps(this.state.searchTopic);} )  // () => {return console.log(`state updated in app component originating from Nav ${this.state.searchTopic} ${this.state.prevSearchTopic}`)})
+    }, () => {this.createPhotos( searchTopicDownstream);} )  
   }
 }
 
-
  // fetch images using fetch api 
-async createPhotoComps(searchTopic) {
+ async createPhotos(searchTopic) {
   console.log(`hia`);
   if(this.state.prevSearchTopic !== searchTopic) {
   console.log(`create photo-array called with searchTopic: ${searchTopic}`);
@@ -49,41 +52,36 @@ async createPhotoComps(searchTopic) {
   .then(data => data.map(x => `https://live.staticflickr.com/${x.server}/${x.id}_${x.secret}_w.gif`)) 
   .then(data => this.setState({
     photos: data,
-    searchTopic: searchTopic}, () => {console.log(`updated photos in app-state ${this.state.searchTopic} ${this.state.prevSearchTopic}`)})
-  ) //.catch(console.log("404")) ;  
+    searchTopic: searchTopic }, () => {console.log(`updated photos in app-state. New: ${this.state.searchTopic} Old: ${this.state.prevSearchTopic}`)})
+  )
   }}
 
-
 componentDidMount() {
-  console.log("app did mount");
-  this.createPhotoComps("forest");
-  console.log(apiKey);
-  }
+ this.createPhotos(this.state.searchTopic);
+}
 
-componentShouldChange() {
-  console.log("app should change");
-  //this.createPhotoComps("forest");
-  }
-  
-
-componentDidChange() {
+/*
+componentDidUpdate() {
+if (this.state.searchTopic !== this.state.prevSearchTopic) {  
 console.log("app did change");
-}
+this.createPhotos(this.state.searchTopic);
+} }
     
-componentWillUnmount() {
-  console.log("app will unmount");
-}
+*/
 
 // callback to modify state from a prop changed in SearchForm 
 render() {
   return (    
     <div className="container">
-    <BrowserRouter>  
+    <BrowserRouter> 
     <SearchForm changeTopicSearch={this.updateSearchTopic} />
     <Nav changeTopicNav={this.updateSearchTopic} /> 
-
     <Switch> 
-    <Route  path="/:searchTopic" children={<PhotoContainer searchTopic={this.state.searchTopic} photos={this.state.photos}/> } />   
+    <Route exact path= "/" component={Init} />
+    <Route  exact path="/forest" children={<PhotoContainer searchTopic={"forest"} photos={this.state.photos}/> } />   
+    <Route  exact path="/beach"  children={<PhotoContainer searchTopic={"beach"} photos={this.state.photos}/> } />   
+    <Route  exact path="/waterfall"  children={<PhotoContainer searchTopic={"waterfall"} photos={this.state.photos}/> } />   
+    <Route   path="/:searchTopic" children={<PhotoContainer searchTopic={this.state.searchTopic} photos={this.state.photos}/> } />   
     <Route component={NotFound} />
     </Switch> 
     </BrowserRouter>

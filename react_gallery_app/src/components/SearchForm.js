@@ -8,7 +8,6 @@ class SearchForm extends Component {
   
   constructor(props) {
     super(props);
-    //console.log(`So jetzt in search-component: ${this.props.changeSearchTopic}`); // okay: kommt an
     this.state = { searchTopic: '' };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -23,10 +22,10 @@ class SearchForm extends Component {
   // handles new searchTopics as requested by user input 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.setState({ searchTopic: e.target.value }); // this routes to the new path 
-    console.log(`local state in search after submit: ${this.state.searchTopic}`);
-    this.props.changeTopicSearch(this.state.searchTopic);
-    this.setState({ searchTopic: ''});
+    this.setState(
+      { searchTopic: e.target.value 
+      }, this.props.changeTopicSearch(this.state.searchTopic) );
+    //this.setState({ searchTopic: ''});
   }
     
   componentDidMount() {
