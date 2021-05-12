@@ -3,7 +3,7 @@ import Photo from './Photo';
 import {withRouter} from 'react-router';
 import { Route, Link, Redirect, Router } from 'react-router-dom';
 import { useHistory } from "react-router-dom";
-
+import { useLocation } from 'react-router-dom'
 
 class PhotoContainer extends PureComponent {    
     
@@ -15,25 +15,8 @@ class PhotoContainer extends PureComponent {
           photoComps: []
         };
       this.createPhotoComps = this.createPhotoComps.bind(this);
-      this.redirectToPath = this.redirectToPath.bind(this);
       }
       
-      
-  redirectToPath = (path) => {
-      console.log(`called redirect ${path}`);
-      if (path !== this.state.searchTopic) {
-      const { history } = this.props;
-      if(history) { 
-        console.log(`this is the path or route? ${path}`);
-        history.push( {
-          pathname: path,
-          photos: this.state.photos,
-          photoComps: this.state.photoComps
-        })
-      };
-     }}
-      
-
  createPhotoComps(photos) { 
   if (this.props.photos[0] !== this.state.photos[0]) { 
   let photoComps = [];
@@ -41,28 +24,27 @@ class PhotoContainer extends PureComponent {
     console.log(photos[i])
      photoComps.push( <Photo url={photos[i]} key={i} />) ;
   }
-  this.setState({photos: photos, photoComps: photoComps, searchTopic: this.props.searchTopic});
-  this.redirectToPath(this.props.searchTopic);
+  this.setState({photos: photos, photoComps: photoComps});
  }}
   
 
 componentDidMount() {
-  if (this.props.searchTopic!== this.state.searchTopic) {
+ // if (this.props.searchTopic!== this.state.searchTopic) {
   console.log(`Huhuuu_1 ${this.props.searchTopic}`);
   this.createPhotoComps(this.props.photos);
   }
-}
+//}
 
 componentDidUpdate() {
   console.log('photcomps is hereee')
   //if (this.props.searchTopic!== this.state.searchTopic) {
-    console.log(`Huhuuu_2 ${this.state.searchTopic}`);
+    console.log(`PhotoContainer ComponenentDidUpdate. New props search topic: ${this.props.searchTopic}, state search topic ${this.state.searchTopic}`);
     this.createPhotoComps(this.props.photos);
-//}
 }
+//}
 
 render() { 
-  const { history } = this.props;
+ // const { history } = this.props;
   return ( 
 
       <div className="photo-container"  >
@@ -70,7 +52,6 @@ render() {
          <ul>
            { this.state.photoComps } 
          </ul>
-         
         </div> 
         )  
   };

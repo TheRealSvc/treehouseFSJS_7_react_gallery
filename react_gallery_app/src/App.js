@@ -6,8 +6,6 @@ import PhotoContainer from './components/PhotoContainer';
 import NotFound from './components/NotFound';
 import Init from './components/Init';
 import apiKey from './config';
-
-
 import React, { Component } from 'react';
 import {
   BrowserRouter,
@@ -26,23 +24,25 @@ constructor(props) {
     prevSearchTopic: '',
     photos: []
   }; 
+  this.updateSearchTopic = this.updateSearchTopic.bind(this) ;
 }
  
  updateSearchTopic = (searchTopicDownstream) => {
    console.log('in updateSearchTopic before if ');
-   if (this.state.searchTopic !== searchTopicDownstream ) {
-    console.log('in updateSearchTopic after if ');
+  // if (this.state.searchTopic !== searchTopicDownstream ) {
+    console.log(`in updateSearchTopic after if with searchTopic ${searchTopicDownstream}`);
+    console.log(this.state.searchTopic);
   this.setState( 
     {
       searchTopic: searchTopicDownstream,
       prevSearchTopic: this.state.searchTopic
-    }, () => {this.createPhotos( searchTopicDownstream);} )  
-  }
+    }, () => {this.createPhotos( searchTopicDownstream );} )  
+  //}
 }
 
  // fetch images using fetch api 
  async createPhotos(searchTopic) {
-  console.log(`hia`);
+  console.log(`in App / createPhotos`);
   if(this.state.prevSearchTopic !== searchTopic) {
   console.log(`create photo-array called with searchTopic: ${searchTopic}`);
   const url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=${searchTopic}&per_page=20&format=json&nojsoncallback=1`
@@ -52,7 +52,7 @@ constructor(props) {
   .then(data => data.map(x => `https://live.staticflickr.com/${x.server}/${x.id}_${x.secret}_w.gif`)) 
   .then(data => this.setState({
     photos: data,
-    searchTopic: searchTopic }, () => {console.log(`updated photos in app-state. New: ${this.state.searchTopic} Old: ${this.state.prevSearchTopic}`)})
+    searchTopic: searchTopic }, () => {console.log(`updated photos in app-state. New: ${this.state.searchTopic} , Old: ${this.state.prevSearchTopic}`)})
   )
   }}
 
@@ -62,12 +62,13 @@ componentDidMount() {
 
 /*
 componentDidUpdate() {
-if (this.state.searchTopic !== this.state.prevSearchTopic) {  
-console.log("app did change");
-this.createPhotos(this.state.searchTopic);
-} }
-    
-*/
+this.setState();
+  //if (this.state.searchTopic !== this.state.prevSearchTopic) {  
+//console.log("app did change");
+//this.createPhotos(this.state.searchTopic);
+} 
+*/  
+
 
 // callback to modify state from a prop changed in SearchForm 
 render() {
@@ -81,7 +82,7 @@ render() {
     <Route  exact path="/forest" children={<PhotoContainer searchTopic={"forest"} photos={this.state.photos}/> } />   
     <Route  exact path="/beach"  children={<PhotoContainer searchTopic={"beach"} photos={this.state.photos}/> } />   
     <Route  exact path="/waterfall"  children={<PhotoContainer searchTopic={"waterfall"} photos={this.state.photos}/> } />   
-    <Route   path="/:searchTopic" children={<PhotoContainer searchTopic={this.state.searchTopic} photos={this.state.photos}/> } />   
+    <Route  path="/:searchTopic" children={<PhotoContainer searchTopic={this.state.searchTopic} photos={this.state.photos}/> } />   
     <Route component={NotFound} />
     </Switch> 
     </BrowserRouter>

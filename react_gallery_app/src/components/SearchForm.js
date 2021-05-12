@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 
 class SearchForm extends Component {    
-  
+
   constructor(props) {
     super(props);
     this.state = { searchTopic: '' };
@@ -14,7 +14,7 @@ class SearchForm extends Component {
   }
 
   handleChange = (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     this.setState({ searchTopic: e.target.value });
     console.log(`target value in search: ${e.target.value}`);
   }
@@ -22,19 +22,25 @@ class SearchForm extends Component {
   // handles new searchTopics as requested by user input 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.setState(
-      { searchTopic: e.target.value 
-      }, this.props.changeTopicSearch(this.state.searchTopic) );
-    //this.setState({ searchTopic: ''});
+    let path = `/search/${this.state.searchTopic}`;
+    console.log(`now in handle submit of SearchForm. Path is ${path}`) ;
+    this.props.history.push(path);
+    //this.setState(
+    //  { searchTopic: e.target.value 
+    //  }, 
+    this.props.changeTopicSearch(this.state.searchTopic); //);
+    this.setState({ searchTopic: ''});
   }
     
+  /*
   componentDidMount() {
     console.log("app did mount");
     console.log(this.state);
     }
+    
   componentWillUnmount() {
     console.log("app will unmount");
-  }
+  } */
 
   render() {
     return (  
