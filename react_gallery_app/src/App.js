@@ -4,9 +4,8 @@ import SearchForm from './components/SearchForm';
 import Nav from './components/Nav';
 import PhotoContainer from './components/PhotoContainer';
 import NotFound from './components/NotFound';
+import Init from './components/Init';
 import apiKey from './config';
-
-
 import React, { Component } from 'react';
 import {
   BrowserRouter,
@@ -18,59 +17,79 @@ import {
 class App extends Component  {
 
 //initialize with defaults
-state = {
+constructor(props) {
+  super(props);
+  this.state = {
+    searchTopic: 'forest',
     prevSearchTopic: '',
-    searchTopic: 'default',
-    photos: [
-    {
-      url: 'https://live.staticflickr.com/65535/51156408855_78b6a67c91_w.jpg',
-      id: 0  
-    },
-    {
-      url: 'https://live.staticflickr.com/65535/51156408855_78b6a67c91_w.jpg',
-      id: 1  
-    }
-  ]
+    photos: []
   }; 
+  this.updateSearchTopic = this.updateSearchTopic.bind(this) ;
+}
+ 
+ updateSearchTopic = (searchTopicDownstream) => {
+   console.log('in updateSearchTopic before if ');
+  // if (this.state.searchTopic !== searchTopicDownstream ) {
+    console.log(`in updateSearchTopic after if with searchTopic ${searchTopicDownstream}`);
+    console.log(this.state.searchTopic);
+  this.setState( 
+    {
+      searchTopic: searchTopicDownstream,
+      prevSearchTopic: this.state.searchTopic
+    }, () => {this.createPhotos( searchTopicDownstream );} )  
+  //}
+}
 
  // fetch images using fetch api 
- updateSearchTopic = (searchTopicDownstream) => {
-   if (searchTopicDownstream === this.state.prevSearchTopic) {
-     return } 
-  // ToDo replace api key by prop
-  let url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=bb7980f0ad50ca47d1b83d0f338862b3&text=${searchTopicDownstream}&per_page=20&format=json&nojsoncallback=1`
+ async createPhotos(searchTopic) {
+  console.log(`in App / createPhotos`);
+  if(this.state.prevSearchTopic !== searchTopic) {
+  console.log(`create photo-array called with searchTopic: ${searchTopic}`);
+  const url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=${searchTopic}&per_page=20&format=json&nojsoncallback=1`
   fetch(url)
   .then(response => response.json())
   .then(data => data.photos.photo)
-  .then(data => data.map(x => `https://live.staticflickr.com/${x.server}/${x.id}_${x.secret}_w.jpg`)) 
-  .then(data => this.setState( prevState => {
-    return {
-      photos: data, 
-      searchTopic: searchTopicDownstream,
-      prevSearchTopic: searchTopicDownstream
-    } 
-  }))
-console.log(`in app.js: ${this.state.photos}`); 
+  .then(data => data.map(x => `https://live.staticflickr.com/${x.server}/${x.id}_${x.secret}_w.gif`)) 
+  .then(data => this.setState({
+    photos: data,
+    searchTopic: searchTopic }, () => {console.log(`updated photos in app-state. New: ${this.state.searchTopic} , Old: ${this.state.prevSearchTopic}`)})
+  )
+  }}
+
+componentDidMount() {
+ this.createPhotos(this.state.searchTopic);
 }
 
-//https://live.staticflickr.com/{server-id}/{id}_{secret}_{size-suffix}.jpg
+/*
+componentDidUpdate() {
+this.setState();
+  //if (this.state.searchTopic !== this.state.prevSearchTopic) {  
+//console.log("app did change");
+//this.createPhotos(this.state.searchTopic);
+} 
+*/  
+
 
 // callback to modify state from a prop changed in SearchForm 
 render() {
-  return (
-  <BrowserRouter> 
+  return (    
     <div className="container">
-      <SearchForm changeSearchTopic={this.updateSearchTopic} /> 
-      <Nav changeSearchTopicNav={this.updateSearchTopic} /> 
-      <Switch>
-        <Route exact path="/:searchTopic" render={ () => <PhotoContainer photos={this.state.photos} /> } />   
-        <Route component={NotFound} />
-        
-      </Switch>
-    </div>
-  </BrowserRouter>
+    <BrowserRouter> 
+    <SearchForm changeTopicSearch={this.updateSearchTopic} />
+    <Nav changeTopicNav={this.updateSearchTopic} /> 
+    <Switch> 
+    <Route exact path= "/" component={Init} />
+    <Route  exact path="/forest" children={<PhotoContainer searchTopic={"forest"} photos={this.state.photos}/> } />   
+    <Route  exact path="/beach"  children={<PhotoContainer searchTopic={"beach"} photos={this.state.photos}/> } />   
+    <Route  exact path="/waterfall"  children={<PhotoContainer searchTopic={"waterfall"} photos={this.state.photos}/> } />   
+    <Route  path="/:searchTopic" children={<PhotoContainer searchTopic={this.state.searchTopic} photos={this.state.photos}/> } />   
+    <Route component={NotFound} />
+    </Switch> 
+    </BrowserRouter>
+   </div>   
 );
 }
 }
 
 export default App;
+

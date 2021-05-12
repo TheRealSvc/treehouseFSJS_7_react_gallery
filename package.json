@@ -1,0 +1,19 @@
+{
+  "name": "treehousefsjs_7_react_gallery",
+  "description": "project 7 of the treehouse fullstack developer tech degree",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheRealSvc/treehouseFSJS_7_react_gallery.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheRealSvc/treehouseFSJS_7_react_gallery/issues"
+  },
+  "homepage": "https://github.com/TheRealSvc/treehouseFSJS_7_react_gallery#readme"
+}
