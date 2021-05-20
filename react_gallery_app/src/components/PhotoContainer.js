@@ -1,56 +1,52 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import Photo from './Photo';
 import {withRouter} from 'react-router';
 import { Route, Link, Redirect, Router } from 'react-router-dom';
 import { useHistory } from "react-router-dom";
 import { useLocation } from 'react-router-dom'
+import PropTypes from 'prop-types';
+import NotFound from './NotFound';
 
-class PhotoContainer extends PureComponent {    
-    
+class PhotoContainer extends Component {    
+  static propTypes = {
+    match: PropTypes.object.isRequired,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired
+  }
+
     constructor(props) {
         super(props);
         this.state = {
           searchTopic: 'nothin',
-          photos: [],
           photoComps: []
         };
-      this.createPhotoComps = this.createPhotoComps.bind(this);
       }
-      
- createPhotoComps(photos) { 
-  if (this.props.photos[0] !== this.state.photos[0]) { 
-  let photoComps = [];
-  for (let i=0; i<photos.length-1; i++) {
-    console.log(photos[i])
-     photoComps.push( <Photo url={photos[i]} key={i} />) ;
-  }
-  this.setState({photos: photos, photoComps: photoComps});
- }}
+
+// if path and searchTopic (state) differ, photos are fetched again to match the path  
+  componentDidUpdate() {
+    const { match, location, history } = this.props ;
   
+    let newSearchTopic =  location.pathname.replace(/^\/[\w\d]+\//, ''); // removes the "search/" part 
+    //console.log(`1 ${location.pathname}`);
+    if( (this.state.searchTopic !== newSearchTopic)) {
+      //console.log(`2 ${newSearchTopic}`);
+      this.setState({searchTopic: newSearchTopic });
+      this.props.createPhotos(newSearchTopic) ;
+}}
 
-componentDidMount() {
- // if (this.props.searchTopic!== this.state.searchTopic) {
-  console.log(`Huhuuu_1 ${this.props.searchTopic}`);
-  this.createPhotoComps(this.props.photos);
-  }
-//}
-
-componentDidUpdate() {
-  console.log('photcomps is hereee')
-  //if (this.props.searchTopic!== this.state.searchTopic) {
-    console.log(`PhotoContainer ComponenentDidUpdate. New props search topic: ${this.props.searchTopic}, state search topic ${this.state.searchTopic}`);
-    this.createPhotoComps(this.props.photos);
-}
-//}
 
 render() { 
- // const { history } = this.props;
+  
   return ( 
 
       <div className="photo-container"  >
          <h2> {`${this.props.searchTopic} Gifs`}</h2>    
          <ul>
-           { this.state.photoComps } 
+           { 
+              !!this.props.photoComps || this.props.length>0 ? 
+              this.props.photoComps :
+              <NotFound />
+          } 
          </ul>
         </div> 
         )  

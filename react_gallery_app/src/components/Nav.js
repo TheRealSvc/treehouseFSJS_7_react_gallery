@@ -3,31 +3,26 @@ import { Route, Link, Redirect, Router } from 'react-router-dom';
 import {useParams } from 'react-router-dom'
 import PhotoContainer from './PhotoContainer';
 import { withRouter } from "react-router";
+import PropTypes from 'prop-types';
 
-// component for standard routes 
+// component for 3 standard routes. By calling this.props.createPhotos the photographs are fetched again. 
 class Nav extends Component { 
-      
+ 
   constructor(props) {
     super(props);
-    this.state = { navSearchTopic: '' };
   }
-
-  componentDidMount() {
-    console.log("Nav: app did mount");
-    }
-  
 
     render() {  
     return(
-    <div>
-     <nav className="main-nav">
-        <ul>
-           <li><Link to={`/forest`} onClick={ (e) => { this.props.changeTopicNav("forest") }} > forest </Link> </li>  
-           <li><Link to={`/beach`} onClick={ (e) => { this.props.changeTopicNav("beach") }} > beach </Link> </li>  
-           <li><Link to={`/waterfall`} onClick={ (e) => { this.props.changeTopicNav("waterfall") }} > waterfall </Link> </li>   
-        </ul>       
-    </nav> 
-    </div>    
+      <div>
+      <nav className="main-nav">
+         <ul>
+            <li><Link to={`/forest`} onClick={ (e) => { this.props.createPhotos("forest") }} > forest </Link> </li>  
+            <li><Link to={`/beach`} onClick={ (e) => { this.props.createPhotos("beach") }} > beach </Link> </li>  
+            <li><Link to={`/waterfall`} onClick={ (e) => { this.props.createPhotos("waterfall") }} > waterfall </Link> </li>   
+         </ul>       
+     </nav> 
+     </div>   
     )}
 }
 

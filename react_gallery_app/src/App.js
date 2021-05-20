@@ -7,6 +7,8 @@ import NotFound from './components/NotFound';
 import Init from './components/Init';
 import apiKey from './config';
 import React, { Component } from 'react';
+
+
 import {
   BrowserRouter,
   Route,
@@ -15,81 +17,98 @@ import {
 
 
 class App extends Component  {
-
 //initialize with defaults
 constructor(props) {
   super(props);
   this.state = {
     searchTopic: 'forest',
     prevSearchTopic: '',
-    photos: []
-  }; 
+    photos: [],
+    loading: true
+  };
+  this.searchHistory = [] ; 
   this.updateSearchTopic = this.updateSearchTopic.bind(this) ;
+  this.createPhotoComps = this.createPhotoComps.bind(this) ; 
+  this.createPhotos = this.createPhotos.bind(this) ;
 }
- 
+
+
  updateSearchTopic = (searchTopicDownstream) => {
-   console.log('in updateSearchTopic before if ');
-  // if (this.state.searchTopic !== searchTopicDownstream ) {
-    console.log(`in updateSearchTopic after if with searchTopic ${searchTopicDownstream}`);
-    console.log(this.state.searchTopic);
+   console.log(`App: updateSearchTopic before if with searchTopic ${searchTopicDownstream}`);
+   if (this.state.searchTopic !== searchTopicDownstream ) {
+    console.log(`App: updateSearchTopic after if with searchTopic ${searchTopicDownstream}`);
   this.setState( 
     {
       searchTopic: searchTopicDownstream,
       prevSearchTopic: this.state.searchTopic
-    }, () => {this.createPhotos( searchTopicDownstream );} )  
-  //}
+    }, () => { this.createPhotos( searchTopicDownstream ) });  
+  }
 }
 
- // fetch images using fetch api 
- async createPhotos(searchTopic) {
-  console.log(`in App / createPhotos`);
-  if(this.state.prevSearchTopic !== searchTopic) {
-  console.log(`create photo-array called with searchTopic: ${searchTopic}`);
-  const url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=${searchTopic}&per_page=20&format=json&nojsoncallback=1`
+// function to create list elemenst from photo array
+createPhotoComps(photos) { 
+  console.log(`App, createPhotoComps with first photo ${photos[0]}`); 
+  let photoComps = [];
+  for (let i=0; i<photos.length-1; i++) {
+    console.log(photos[i])
+     photoComps.push( <Photo url={photos[i]} key={i} />) ;
+  }
+  return photoComps;
+ }
+
+ // fetch images using fetch api. Generates li of photos and saves to state  
+ createPhotos(searchTopic2) {
+  console.log(`in App: createPhotos with searchTopic ${searchTopic2}`);
+  if(this.state.prevSearchTopic !== searchTopic2) {
+  console.log(`in App: createPhotos prevsearchTopic different from new searchTopic}`);
+  const url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=${searchTopic2}&per_page=24&format=json&nojsoncallback=1`
   fetch(url)
   .then(response => response.json())
   .then(data => data.photos.photo)
   .then(data => data.map(x => `https://live.staticflickr.com/${x.server}/${x.id}_${x.secret}_w.gif`)) 
+  .then(data => this.createPhotoComps(data))
   .then(data => this.setState({
-    photos: data,
-    searchTopic: searchTopic }, () => {console.log(`updated photos in app-state. New: ${this.state.searchTopic} , Old: ${this.state.prevSearchTopic}`)})
-  )
+    photoComps: data,
+    searchTopic: searchTopic2 ,
+    prevSearchTopic: searchTopic2,
+    loading: false }, 
+      () => { console.log(`App: createPhotos setState with new searchTopic: ${this.state.searchTopic}`); } ))
+   .catch(error => {
+    console.log('Error in createPhotos in App.js', error);
+  });   
   }}
 
+    
 componentDidMount() {
- this.createPhotos(this.state.searchTopic);
-}
+    console.log(`App: componentDidMount, with searchTopic (state):  ${this.state.searchTopic}`) 
+    this.createPhotos(this.state.searchTopic) ;
+  } 
+ 
+  /*
+componentWillUpdate() {
+ console.log(`App: componentDidUpdate with searchTopic (state): ${this.state.searchTopic}`) 
+ this.createPhotos(this.state.searchTopic) ;
+  } */  
 
-/*
-componentDidUpdate() {
-this.setState();
-  //if (this.state.searchTopic !== this.state.prevSearchTopic) {  
-//console.log("app did change");
-//this.createPhotos(this.state.searchTopic);
-} 
-*/  
-
-
-// callback to modify state from a prop changed in SearchForm 
+// Routing 
 render() {
   return (    
     <div className="container">
-    <BrowserRouter> 
-    <SearchForm changeTopicSearch={this.updateSearchTopic} />
-    <Nav changeTopicNav={this.updateSearchTopic} /> 
-    <Switch> 
-    <Route exact path= "/" component={Init} />
-    <Route  exact path="/forest" children={<PhotoContainer searchTopic={"forest"} photos={this.state.photos}/> } />   
-    <Route  exact path="/beach"  children={<PhotoContainer searchTopic={"beach"} photos={this.state.photos}/> } />   
-    <Route  exact path="/waterfall"  children={<PhotoContainer searchTopic={"waterfall"} photos={this.state.photos}/> } />   
-    <Route  path="/:searchTopic" children={<PhotoContainer searchTopic={this.state.searchTopic} photos={this.state.photos}/> } />   
-    <Route component={NotFound} />
-    </Switch> 
-    </BrowserRouter>
+      <BrowserRouter> 
+      <SearchForm createPhotos={this.createPhotos} /> 
+      <Nav createPhotos={this.createPhotos} /> 
+        <Switch> 
+          <Route exact path= "/" component={Init} />  
+          <Route exact path="/forest" render={ () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={"forest"} photoComps={this.state.photoComps}/> } /> 
+          <Route exact path="/beach" render={  () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={"beach"} photoComps={this.state.photoComps}/> } />
+          <Route exact path="/waterfall" render={ () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={"waterfall"} photoComps={this.state.photoComps}/> } />
+          <Route path="/search/:searchTopic" render={ () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={this.state.searchTopic} photoComps={this.state.photoComps} /> } /> 
+          <Route component={NotFound} />
+          </Switch> 
+      </BrowserRouter>
    </div>   
 );
 }
 }
 
 export default App;
-
