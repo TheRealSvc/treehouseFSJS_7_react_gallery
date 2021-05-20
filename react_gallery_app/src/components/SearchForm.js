@@ -14,7 +14,7 @@ class SearchForm extends Component {
   handleChange = (e) => {
     e.preventDefault();
     this.setState({ searchTopic: e.target.value });
-    console.log(`target value in search: ${e.target.value}`);
+    //console.log(`target value in search: ${e.target.value}`);
   }
 
   // handles new searchTopics as requested by user search. By calling this.props.createPhotos new photos are fetched. 

@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-import Photo from './Photo';
 import {withRouter} from 'react-router';
-import { Route, Link, Redirect, Router } from 'react-router-dom';
-import { useHistory } from "react-router-dom";
-import { useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import NotFound from './NotFound';
 
@@ -29,21 +25,18 @@ class PhotoContainer extends Component {
     let newSearchTopic =  location.pathname.replace(/^\/[\w\d]+\//, ''); // removes the "search/" part 
     //console.log(`1 ${location.pathname}`);
     if( (this.state.searchTopic !== newSearchTopic)) {
-      //console.log(`2 ${newSearchTopic}`);
+     // console.log(`2 ${this.props.photoComps}`);
       this.setState({searchTopic: newSearchTopic });
       this.props.createPhotos(newSearchTopic) ;
 }}
 
-
-render() { 
-  
+render() {   
   return ( 
-
       <div className="photo-container"  >
          <h2> {`${this.props.searchTopic} Gifs`}</h2>    
          <ul>
            { 
-              !!this.props.photoComps || this.props.length>0 ? 
+              this.props.photoComps[0] !== "noRes" ? 
               this.props.photoComps :
               <NotFound />
           } 

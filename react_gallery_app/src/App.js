@@ -3,7 +3,7 @@ import Photo from './components/Photo';
 import SearchForm from './components/SearchForm';
 import Nav from './components/Nav';
 import PhotoContainer from './components/PhotoContainer';
-import NotFound from './components/NotFound';
+import InvalidRoute from './components/InvalidRoute';
 import Init from './components/Init';
 import apiKey from './config';
 import React, { Component } from 'react';
@@ -32,11 +32,9 @@ constructor(props) {
   this.createPhotos = this.createPhotos.bind(this) ;
 }
 
-
+// function which is passed as prop to child components in order to change the searchTopic and start fetching
  updateSearchTopic = (searchTopicDownstream) => {
-   console.log(`App: updateSearchTopic before if with searchTopic ${searchTopicDownstream}`);
    if (this.state.searchTopic !== searchTopicDownstream ) {
-    console.log(`App: updateSearchTopic after if with searchTopic ${searchTopicDownstream}`);
   this.setState( 
     {
       searchTopic: searchTopicDownstream,
@@ -45,22 +43,21 @@ constructor(props) {
   }
 }
 
-// function to create list elemenst from photo array
-createPhotoComps(photos) { 
-  console.log(`App, createPhotoComps with first photo ${photos[0]}`); 
+// function to create list elements from the photo array
+createPhotoComps(photos) {  
   let photoComps = [];
   for (let i=0; i<photos.length-1; i++) {
-    console.log(photos[i])
      photoComps.push( <Photo url={photos[i]} key={i} />) ;
   }
-  return photoComps;
+  if (photoComps.length>0) { 
+    return(photoComps) 
+   } else { return(['noRes']) } ; 
  }
 
  // fetch images using fetch api. Generates li of photos and saves to state  
  createPhotos(searchTopic2) {
-  console.log(`in App: createPhotos with searchTopic ${searchTopic2}`);
   if(this.state.prevSearchTopic !== searchTopic2) {
-  console.log(`in App: createPhotos prevsearchTopic different from new searchTopic}`);
+  this.setState({ loading: true })
   const url=`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=${searchTopic2}&per_page=24&format=json&nojsoncallback=1`
   fetch(url)
   .then(response => response.json())
@@ -84,16 +81,15 @@ componentDidMount() {
     this.createPhotos(this.state.searchTopic) ;
   } 
  
-  /*
-componentWillUpdate() {
- console.log(`App: componentDidUpdate with searchTopic (state): ${this.state.searchTopic}`) 
- this.createPhotos(this.state.searchTopic) ;
-  } */  
 
 // Routing 
 render() {
   return (    
     <div className="container">
+    {
+      (this.state.loading)
+       ? <p> Loading...</p>
+       :
       <BrowserRouter> 
       <SearchForm createPhotos={this.createPhotos} /> 
       <Nav createPhotos={this.createPhotos} /> 
@@ -103,9 +99,9 @@ render() {
           <Route exact path="/beach" render={  () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={"beach"} photoComps={this.state.photoComps}/> } />
           <Route exact path="/waterfall" render={ () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={"waterfall"} photoComps={this.state.photoComps}/> } />
           <Route path="/search/:searchTopic" render={ () => <PhotoContainer createPhotos={this.createPhotos} searchTopic={this.state.searchTopic} photoComps={this.state.photoComps} /> } /> 
-          <Route component={NotFound} />
+          <Route component={InvalidRoute} />
           </Switch> 
-      </BrowserRouter>
+      </BrowserRouter> }
    </div>   
 );
 }
