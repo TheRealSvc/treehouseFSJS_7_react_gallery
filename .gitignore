@@ -24,4 +24,4 @@ yarn-error.log*
 
 # svc
 
-/config.js
+/src/config.js
