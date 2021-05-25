@@ -5,9 +5,7 @@ import NotFound from './NotFound';
 
 class PhotoContainer extends Component {    
   static propTypes = {
-    match: PropTypes.object.isRequired,
-    location: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired
+    location: PropTypes.object.isRequired
   }
 
     constructor(props) {
@@ -20,7 +18,7 @@ class PhotoContainer extends Component {
 
 // if path and searchTopic (state) differ, photos are fetched again to match the path  
   componentDidUpdate() {
-    const { match, location, history } = this.props ;
+    const { location} = this.props ;
   
     let newSearchTopic =  location.pathname.replace(/^\/[\w\d]+\//, ''); // removes the "search/" part 
     //console.log(`1 ${location.pathname}`);

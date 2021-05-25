@@ -77,7 +77,7 @@ createPhotoComps(photos) {
 
     
 componentDidMount() {
-    console.log(`App: componentDidMount, with searchTopic (state):  ${this.state.searchTopic}`) 
+  //  console.log(`App: componentDidMount, with searchTopic (state):  ${this.state.searchTopic}`) 
     this.createPhotos(this.state.searchTopic) ;
   } 
  

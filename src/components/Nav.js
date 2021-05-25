@@ -3,10 +3,6 @@ import {Link } from 'react-router-dom';
 
 // component for 3 standard routes. By calling this.props.createPhotos the photographs are fetched again. 
 class Nav extends Component { 
- 
-  constructor(props) {
-    super(props);
-  }
 
     render() {  
     return(
